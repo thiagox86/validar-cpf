@@ -1,0 +1,115 @@
+<style>
+    #tr-div-cpf,
+    #tr-div-cpf input {
+        width: 100%;
+        margin-bottom: 25px;
+    }
+
+    #tr-div-cpf input {
+        height: 50px;
+        font-size: 1.5em;
+    }
+
+    #tr-div-cpf button {
+        font-family: Ubuntu;
+        font-size: 1.3em;
+    }
+</style>
+
+<div id="tr-div-cpf">
+    <input  type="number" 
+            id="tr-cpf" 
+            placeholder="CPF SEM PONTO E SEM TRAÇO"
+            onkeypress="return apenasNumeros(event)"
+    >
+    <button onclick="validaCPF()">VALIDA CPF</button>
+</div>
+
+<script>
+    function apenasNumeros(e) {
+        let tecla = (window.event) ? event.keyCode : e.which;
+        if ((tecla > 47 && tecla < 58)) 
+            return true;
+        else
+            return false;
+    }
+
+    function validaCPF() {
+        let cpf = document.getElementById('tr-cpf').value;        
+        if(cpf === '') {
+            alert('Favor informe um CPF!');
+            limpaInput();
+        } else if (cpf.length < 11 || cpf.length > 11) {
+            alert('Favor informe um CPF válido!');
+            limpaInput();
+        } else {            
+            let strCPF = cpf.toString();
+            let counter = 0;
+
+            //VERIFICA SE OS 11 DÍGITOS SÃO IGUAIS COMO POR EXEMPLO EM 11111111111
+            for(let i=0; i < strCPF.length - 1; i++) {
+                if(strCPF[i] == strCPF[i+1]) {
+                    strIgual = true;
+                    counter++;
+                } else {
+                    strIgual = false;
+                }                
+            }
+
+            //VERIFICA SE O CONTADOR É IGUAL 10: SE SIM, ENTÃO TODOS OS NÚMEROS SÃO IGUAIS, SENÃO VERIFICA SE O CPF É VÁLIDO SEGUNDO A FÓRMULA DE CÁLCULO DO DÍGITO VERIFICADOR
+            if (counter == 10) {
+                alert('CPF inválido');
+                limpaInput();
+            } else {
+                let soma = 0;
+                let resto;
+                let primeiroDigito;
+                let segundoDigito;
+
+                //BLOCO DE VERIFICAÇÃO DO PRIMEIRO DÍGITO VERIFICADOR
+                for(let i=1; i <= strCPF.length - 2; i++) {
+                    soma = soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);                    
+                }
+                resto = (soma * 10) % 11;
+                
+                if ((resto === 10) || (resto === 11)) {
+                    resto = 0;
+                }
+
+                if (resto !== parseInt(cpf.substring(9, 10))) {
+                    alert('PRIMEIRO Dígito verificador inválido!');
+                } else {
+                    primeiroDigito = true;
+                }
+
+                //BLOCO DE VERIFICAÇÃO DO SEGUNDO DÍGITO VERIFICADOR
+                soma = 0;
+                if(primeiroDigito) {
+                    for (let i = 1; i <= strCPF.length - 1; i++) {
+                        soma = soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
+                    }
+                    resto = (soma * 10) % 11;
+
+                    if ((resto === 10) || (resto === 11)) { 
+                        resto = 0;
+                    }
+
+                    if (resto !== parseInt(cpf.substring(10, 11))) {
+                        alert('SEGUNDO Dígito verificador inválido!');
+                    } else {
+                        segundoDigito = true;
+                    }
+                }
+
+                if( primeiroDigito && segundoDigito) {
+                    alert('CPF VÁLIDO!!!!');                    
+                }
+            }
+            
+        }
+    }
+
+    function limpaInput() {
+        document.getElementById('tr-cpf').value = '';
+    }
+</script>
